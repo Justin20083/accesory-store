@@ -496,6 +496,55 @@ a {
 
   .whatsapp-mobile {
     display: inline-flex;
+    align-items: center;
+    padding: 10px 12px;
+  }
+
+  /* Ensure hamburger appears before whatsapp icon on small screens */
+  .site-brand {
+    order: 0;
+  }
+
+  .nav-toggle {
+    order: 1;
+  }
+
+  .header-actions {
+    order: 2;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .site-nav {
+    order: 3;
+  }
+
+  .whatsapp-icon {
+    width: 22px;
+    height: 22px;
+    display: block;
+    object-fit: contain;
+  }
+
+  /* WhatsApp button visual tweaks: white background with soft shadows so logo is visible */
+  .whatsapp-mobile,
+  .whatsapp-desktop,
+  .whatsapp-contact {
+    background: #ffffff !important;
+    color: #111 !important;
+    padding: 8px 12px !important;
+    border-radius: 999px !important;
+    box-shadow: 0 8px 20px rgba(17,17,17,0.12), 0 1px 0 rgba(255,255,255,0.6) inset !important;
+    border: 1px solid rgba(17,17,17,0.06) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    text-decoration: none;
+  }
+
+  .whatsapp-desktop {
+    padding: 10px 16px !important;
   }
 
   .hero-section {
@@ -519,5 +568,17 @@ a {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
+  }
+}
+
+/* Phone-specific: show 3 product cards per row */
+@media (max-width: 480px) {
+  .products-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .product-card {
+    border-radius: 16px;
   }
 }
