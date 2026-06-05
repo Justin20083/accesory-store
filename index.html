@@ -174,5 +174,17 @@
     </footer>
 
     <script src="script.js"></script>
+    <!-- Purchase modal -->
+    <div id="purchaseModal" class="modal hidden">
+      <div class="modal-overlay"></div>
+      <div class="modal-card">
+        <h3>Pago no disponible por web</h3>
+        <p id="purchaseMessage">Actualmente el pago mediante la web no está disponible. Puedes redirigirte a WhatsApp para coordinar el pago.</p>
+        <div class="modal-actions">
+          <button id="modalCancel" class="btn btn-secondary">Cancelar</button>
+          <button id="modalRedirect" class="btn btn-primary">Redirigir a WhatsApp</button>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

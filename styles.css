@@ -343,6 +343,12 @@ a {
   min-height: 1.5em;
 }
 
+.product-desc {
+  margin: 8px 0 12px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
 .product-price {
   margin: 0;
   font-size: 1.1rem;
@@ -569,6 +575,40 @@ a {
     align-items: flex-start;
     gap: 16px;
   }
+}
+
+/* Modal for purchase flow */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 60;
+}
+
+.modal.hidden { display: none; }
+
+.modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+}
+
+.modal-card {
+  position: relative;
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  width: min(520px, 92%);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+  z-index: 2;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 16px;
 }
 
 /* Phone-specific: show 3 product cards per row */
