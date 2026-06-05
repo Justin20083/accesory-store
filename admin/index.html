@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Accesory Store</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+  <body>
+    <div class="admin-container">
+      <aside class="admin-sidebar">
+        <div class="sidebar-brand">
+          <img src="../logo.png" alt="Logo" class="sidebar-logo" />
+          <span>Accesory Store</span>
+        </div>
+
+        <nav class="sidebar-nav">
+          <button class="nav-item active" data-tab="dashboard">Dashboard</button>
+          <button class="nav-item" data-tab="products">Productos</button>
+          <button class="nav-item" data-tab="sales">Ventas</button>
+        </nav>
+      </aside>
+
+      <main class="admin-main">
+        <!-- Dashboard Tab -->
+        <section id="dashboard" class="tab-content active">
+          <div class="tab-header">
+            <h1>Dashboard</h1>
+            <div class="date-filter">
+              <input type="date" id="filterDate" />
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">Ganancias Totales</div>
+              <div class="stat-value" id="totalEarnings">$0.00</div>
+              <div class="stat-change positive">+12% este mes</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Productos</div>
+              <div class="stat-value" id="totalProducts">0</div>
+              <div class="stat-change">en catálogo</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Órdenes</div>
+              <div class="stat-value" id="totalOrders">0</div>
+              <div class="stat-change">registradas</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Promedio por Producto</div>
+              <div class="stat-value" id="avgPrice">$0.00</div>
+              <div class="stat-change">precio</div>
+            </div>
+          </div>
+
+          <div class="charts-section">
+            <div class="chart-container">
+              <h3>Ganancias por Mes</h3>
+              <canvas id="earningsChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+              <h3>Productos Más Vendidos</h3>
+              <div id="topProducts" class="top-products-list">
+                <p>Sin datos aún</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Products Tab -->
+        <section id="products" class="tab-content">
+          <div class="tab-header">
+            <h1>Gestionar Productos</h1>
+            <button class="btn btn-primary" id="addProductBtn">+ Agregar Producto</button>
+          </div>
+
+          <!-- Add/Edit Product Form -->
+          <div id="productForm" class="product-form hidden">
+            <div class="form-overlay"></div>
+            <div class="form-card">
+              <div class="form-header">
+                <h2 id="formTitle">Nuevo Producto</h2>
+                <button class="form-close" id="closeFormBtn">&times;</button>
+              </div>
+
+              <form id="productsFormElement">
+                <div class="form-group">
+                  <label>Título del Producto</label>
+                  <input
+                    type="text"
+                    id="productTitle"
+                    placeholder="Ej: Funda iPhone 15"
+                    required
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label>Precio</label>
+                  <input type="number" id="productPrice" placeholder="0.00" step="0.01" required />
+                </div>
+
+                <div class="form-group">
+                  <label>Imagen (URL o Base64)</label>
+                  <div class="image-upload">
+                    <input type="file" id="productImage" accept="image/*" />
+                    <div id="imagePreview" class="image-preview"></div>
+                  </div>
+                </div>
+
+                <div class="form-group checkbox">
+                  <input type="checkbox" id="isFeatured" />
+                  <label for="isFeatured">Destacar este producto</label>
+                </div>
+
+                <div class="form-group">
+                  <label>Oferta (%)</label>
+                  <input
+                    type="number"
+                    id="productDiscount"
+                    placeholder="0"
+                    min="0"
+                    max="100"
+                  />
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="btn btn-secondary" id="cancelFormBtn">
+                    Cancelar
+                  </button>
+                  <button type="submit" class="btn btn-primary">Guardar Producto</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Products List -->
+          <div class="products-list" id="productsList">
+            <p class="empty-state">No hay productos. Agrega uno para comenzar.</p>
+          </div>
+        </section>
+
+        <!-- Sales Tab -->
+        <section id="sales" class="tab-content">
+          <div class="tab-header">
+            <h1>Resumen de Ventas</h1>
+          </div>
+
+          <div class="sales-summary">
+            <div class="summary-card">
+              <h3>Estadísticas Generales</h3>
+              <div class="summary-stats">
+                <div class="summary-item">
+                  <span class="label">Ventas Totales</span>
+                  <span class="value" id="salesTotal">$0.00</span>
+                </div>
+                <div class="summary-item">
+                  <span class="label">Número de Órdenes</span>
+                  <span class="value" id="salesOrders">0</span>
+                </div>
+                <div class="summary-item">
+                  <span class="label">Ticket Promedio</span>
+                  <span class="value" id="salesAverage">$0.00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

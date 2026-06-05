@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Accesory Store</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-brand">
+        <img src="logo.png" alt="Accesory Store Logo" class="brand-logo" />
+        <span class="brand-name">Accesory Store</span>
+      </div>
+
+      <button class="nav-toggle" id="menuToggle" aria-label="Abrir menú">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="site-nav" id="siteNav">
+        <a href="#inicio">Inicio</a>
+        <a href="#tienda">Tienda</a>
+        <a href="#comprar">Como Comprar</a>
+        <a href="#contacto">Contacto</a>
+      </nav>
+
+      <div class="header-actions">
+        <a class="btn btn-primary whatsapp-desktop" href="https://wa.me/" target="_blank" rel="noreferrer">
+          Whatsapp ↗
+        </a>
+        <a class="btn btn-primary whatsapp-mobile" href="https://wa.me/" target="_blank" rel="noreferrer">
+          Chatear con nosotros ↗
+        </a>
+      </div>
+    </header>
+
+    <main>
+      <section id="inicio" class="hero-section">
+        <div class="hero-copy">
+          <div class="hero-header">
+            <p class="hero-eyebrow">Accesory Store</p>
+            <h1>Calidad a tu alcance</h1>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="visual-frame">
+            <div class="visual-shape"></div>
+            <picture>
+              <source media="(max-width: 768px)" srcset="Inemobilescreen.png" />
+              <source media="(max-width: 1200px)" srcset="inedesktopscreen.png" />
+              <img src="inedesktopscreen.png" alt="Mapa 99% Clientes Satisfechos" />
+            </picture>
+          </div>
+        </div>
+      </section>
+
+      <section id="tienda" class="content-section">
+        <div class="section-intro">
+          <span class="section-label">Tienda</span>
+          <h2>Accesorios con diseño y calidad al alcance de todos.</h2>
+          <p>
+            Explora nuestros productos, seleccionados para ofrecer lo mejor en estilo, durabilidad y precio justo.
+          </p>
+        </div>
+
+        <div class="featured-section">
+          <div id="featuredProduct" class="featured-product">
+            <div class="featured-placeholder">
+              <p>Últimas Ofertas</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="products-grid" id="productsGrid">
+          <div class="product-card">
+            <div class="product-image"></div>
+            <div class="product-info">
+              <h3></h3>
+              <p class="product-price"></p>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-image"></div>
+            <div class="product-info">
+              <h3></h3>
+              <p class="product-price"></p>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-image"></div>
+            <div class="product-info">
+              <h3></h3>
+              <p class="product-price"></p>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-image"></div>
+            <div class="product-info">
+              <h3></h3>
+              <p class="product-price"></p>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-image"></div>
+            <div class="product-info">
+              <h3></h3>
+              <p class="product-price"></p>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-image"></div>
+            <div class="product-info">
+              <h3></h3>
+              <p class="product-price"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="comprar" class="content-section content-alt">
+        <div class="section-intro">
+          <span class="section-label">Como Comprar</span>
+          <h2>Compra fácil en 3 pasos.</h2>
+          <p>Elige tu producto, confirma tu envío y recibe tu pedido con atención personalizada.</p>
+        </div>
+
+        <div class="steps-grid">
+          <div class="step-card">
+            <strong>1</strong>
+            <h3>Selecciona</h3>
+            <p>Encuentra la pieza adecuada para tu dispositivo o regalo.</p>
+          </div>
+          <div class="step-card">
+            <strong>2</strong>
+            <h3>Confirma</h3>
+            <p>Revisa tu pedido y elige la mejor forma de pago.</p>
+          </div>
+          <div class="step-card">
+            <strong>3</strong>
+            <h3>Recibe</h3>
+            <p>Recibe tu envío rápido y disfruta un producto confiable.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="contacto" class="contact-section">
+        <div class="section-intro">
+          <span class="section-label">Contacto</span>
+          <h2>Estamos listos para ayudarte.</h2>
+          <p>Envía un mensaje por Whatsapp o desplázate dentro del sitio para ver más detalles.</p>
+        </div>
+        <div class="contact-card">
+          <p class="contact-title">¿Tienes dudas?</p>
+          <p class="contact-text">Escríbenos y nos comunicaremos contigo lo antes posible.</p>
+          <a class="btn btn-secondary" href="https://wa.me/" target="_blank" rel="noreferrer">Chatear ahora</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-mark"></div>
+      <div class="footer-copy">© Accesory Store 2026</div>
+      <div class="footer-right">All Rights Reserved</div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
