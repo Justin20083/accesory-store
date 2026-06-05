@@ -1,5 +1,5 @@
 // Inicializar Supabase cuando esté disponible
-let supabase = null;
+let supabaseClient = null;
 
 function initSupabase() {
   if (window.supabase) {
@@ -7,7 +7,7 @@ function initSupabase() {
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZteWVwaHV2eGxzcGlndHFqd21pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2ODA4NDcsImV4cCI6MjA5NjI1Njg0N30.K8S32gXhhbijUvs0nhOMUM9weqcnrICko64-heru-Rk';
     
     const { createClient } = window.supabase;
-    supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     loadProductsList();
     updateDashboard();
   } else {
@@ -114,7 +114,7 @@ productsFormElement.addEventListener('submit', async (e) => {
     
     if (editingProductId) {
       // Update existing product
-      const { error } = await supabase
+      const { error } = await supabaseClient
         .from('productos')
         .update(productData)
         .eq('id', editingProductId);
@@ -122,7 +122,7 @@ productsFormElement.addEventListener('submit', async (e) => {
       if (error) throw error;
     } else {
       // Add new product
-      const { error } = await supabase
+      const { error } = await supabaseClient
         .from('productos')
         .insert([productData]);
       
@@ -144,7 +144,7 @@ async function loadProductsList() {
   const productsList = document.getElementById('productsList');
   
   try {
-    const { data: products, error } = await supabase
+    const { data: products, error } = await supabaseClient
       .from('productos')
       .select('*')
       .order('id', { ascending: false });
@@ -185,7 +185,7 @@ async function loadProductsList() {
 // Edit Product
 async function editProduct(id) {
   try {
-    const { data: product, error } = await supabase
+    const { data: product, error } = await supabaseClient
       .from('productos')
       .select('*')
       .eq('id', id)
@@ -215,7 +215,7 @@ async function deleteProduct(id) {
   if (!confirm('¿Eliminar este producto?')) return;
   
   try {
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('productos')
       .delete()
       .eq('id', id);
@@ -233,7 +233,7 @@ async function deleteProduct(id) {
 // Update Dashboard
 async function updateDashboard() {
   try {
-    const { data: products, error: productsError } = await supabase
+    const { data: products, error: productsError } = await supabaseClient
       .from('productos')
       .select('*');
     

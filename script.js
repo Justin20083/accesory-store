@@ -2,7 +2,7 @@ const menuToggle = document.getElementById('menuToggle');
 const siteNav = document.getElementById('siteNav');
 
 // Inicializar Supabase cuando esté disponible
-let supabase = null;
+let supabaseClient = null;
 
 function initSupabase() {
   if (window.supabase) {
@@ -10,7 +10,7 @@ function initSupabase() {
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZteWVwaHV2eGxzcGlndHFqd21pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2ODA4NDcsImV4cCI6MjA5NjI1Njg0N30.K8S32gXhhbijUvs0nhOMUM9weqcnrICko64-heru-Rk';
     
     const { createClient } = window.supabase;
-    supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     loadProducts();
   } else {
     setTimeout(initSupabase, 100);
@@ -38,7 +38,7 @@ async function loadProducts() {
   
   try {
     // Obtener productos de Supabase
-    const { data: products, error } = await supabase
+    const { data: products, error } = await supabaseClient
       .from('productos')
       .select('*')
       .order('id', { ascending: true });
@@ -98,8 +98,8 @@ async function loadProducts() {
 
 // Escuchar cambios en tiempo real (opcional, si tienes RLS habilitado)
 function subscribeToChanges() {
-  if (supabase) {
-    supabase
+  if (supabaseClient) {
+    supabaseClient
       .channel('productos-changes')
       .on(
         'postgres_changes',
