@@ -4,7 +4,6 @@ const siteNav = document.getElementById('siteNav');
 // Inicializar Supabase cuando esté disponible
 let supabaseClient = null;
 let productsCache = [];
-const LOCAL_KEY = 'productos_local_v1';
 
 function initSupabase() {
   if (window.supabase) {
@@ -47,13 +46,12 @@ async function loadProducts() {
     
     if (error) {
       console.error('Error al cargar productos:', error);
-      // fallback to localStorage if table missing
       if (/Could not find the table/.test(error.message || '')) {
-        const raw = localStorage.getItem(LOCAL_KEY);
-        const local = raw ? JSON.parse(raw) : [];
-        productsCache = local;
-        renderProductsFromCache(local, featuredSection, productsGrid);
-        return;
+        const sql = `CREATE TABLE public.productos (\n  id serial PRIMARY KEY,\n  nombre text NOT NULL,\n  preco numeric(10,2) NOT NULL,\n  imagen_url text,\n  descuento integer DEFAULT 0,\n  descripcion text,\n  created_at timestamptz DEFAULT now()\n);`;
+        console.error('Tabla "public.productos" no encontrada. SQL sugerido:\n' + sql);
+        alert("Tabla 'productos' no encontrada en Supabase. Revisa la consola para el SQL sugerido.");
+      } else {
+        alert('Error al cargar productos. Revisa la consola.');
       }
       return;
     }
@@ -80,17 +78,13 @@ async function loadProducts() {
           <div class="product-info">
             <h3>${product.nombre}</h3>
             <p class="product-price">${precioFormato}</p>
+            ${product.descripcion ? `<p class="product-desc">${product.descripcion}</p>` : ''}
+            <div class="product-actions">
+              <button class="buy-btn" data-id="${product.id}">Comprar</button>
+            </div>
           </div>
         `;
         productsGrid.appendChild(card);
-      });
-      // attach buy delegation
-      productsGrid.addEventListener('click', (e) => {
-        const btn = e.target.closest('.buy-btn');
-        if (!btn) return;
-        const id = parseInt(btn.dataset.id, 10);
-        const prod = productsCache.find(p => p.id === id) || productsCache[id];
-        if (prod) openPurchaseModal(prod);
       });
     } else {
       // Si no hay productos, mostrar placeholders
@@ -113,36 +107,6 @@ async function loadProducts() {
   } catch (error) {
     console.error('Error:', error);
   }
-}
-
-function renderProductsFromCache(list, featuredSection, productsGrid) {
-  featuredSection.classList.toggle('has-product', list && list.length > 0);
-  if (list && list.length > 0) {
-    featuredSection.innerHTML = `<img src="${list[0].imagen_url}" alt="${list[0].nombre}" />`;
-  } else {
-    featuredSection.classList.remove('has-product');
-    featuredSection.innerHTML = '<div class="featured-placeholder"><p>Últimas Ofertas</p></div>';
-  }
-  productsGrid.innerHTML = '';
-  (list || []).forEach(product => {
-    const precioFormato = `$${parseFloat(product.preco || 0).toFixed(2)}`;
-    const card = document.createElement('div');
-    card.className = 'product-card';
-    card.innerHTML = `
-      <div class="product-image">
-        <img src="${product.imagen_url}" alt="${product.nombre}" />
-      </div>
-      <div class="product-info">
-        <h3>${product.nombre}</h3>
-        <p class="product-price">${precioFormato}</p>
-        ${product.descripcion ? `<p class="product-desc">${product.descripcion}</p>` : ''}
-        <div class="product-actions">
-          <button class="buy-btn" data-id="${product.id}">Comprar</button>
-        </div>
-      </div>
-    `;
-    productsGrid.appendChild(card);
-  });
 }
 
 // Purchase modal logic

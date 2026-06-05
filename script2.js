@@ -1,25 +1,5 @@
 // Inicializar Supabase cuando esté disponible
 let supabaseClient = null;
-let useLocalFallback = false;
-const LOCAL_KEY = 'productos_local_v1';
-let localCache = [];
-
-function getLocalProducts() {
-  try {
-    const raw = localStorage.getItem(LOCAL_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch (e) {
-    return [];
-  }
-}
-
-function saveLocalProducts(arr) {
-  localStorage.setItem(LOCAL_KEY, JSON.stringify(arr || []));
-}
-
-function ensureLocalInit() {
-  localCache = getLocalProducts();
-}
 
 async function initSupabase() {
   if (window.supabase) {
@@ -28,16 +8,18 @@ async function initSupabase() {
     
     const { createClient } = window.supabase;
     supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    // Probe existence of table and fallback to localStorage if missing
     try {
       const { error } = await supabaseClient.from('productos').select('id').limit(1);
       if (error && /Could not find the table/.test(error.message || '')) {
-        useLocalFallback = true;
-        ensureLocalInit();
+        const sql = `CREATE TABLE public.productos (\n  id serial PRIMARY KEY,\n  nombre text NOT NULL,\n  preco numeric(10,2) NOT NULL,\n  imagen_url text,\n  descuento integer DEFAULT 0,\n  descripcion text,\n  created_at timestamptz DEFAULT now()\n);`;
+        console.error('Tabla "public.productos" no encontrada. SQL sugerido:\n' + sql);
+        alert("Tabla 'productos' no encontrada en Supabase. Revisa la consola para el SQL sugerido.");
+        return;
       }
     } catch (e) {
-      useLocalFallback = true;
-      ensureLocalInit();
+      console.error('Error comprobando la tabla productos:', e);
+      alert('Error conectando a Supabase. Revisa la consola para más detalles.');
+      return;
     }
     await loadProductsList();
     await updateDashboard();
@@ -145,32 +127,17 @@ productsFormElement.addEventListener('submit', async (e) => {
       descripcion
     };
     
-    if (useLocalFallback) {
-      if (editingProductId) {
-        const idx = localCache.findIndex(p => p.id === editingProductId);
-        if (idx !== -1) localCache[idx] = { ...localCache[idx], ...productData };
-      } else {
-        const nextId = (localCache.reduce((m, p) => Math.max(m, p.id || 0), 0) || 0) + 1;
-        localCache.unshift({ id: nextId, ...productData });
-      }
-      saveLocalProducts(localCache);
+    if (editingProductId) {
+      const { error } = await supabaseClient
+        .from('productos')
+        .update(productData)
+        .eq('id', editingProductId);
+      if (error) throw error;
     } else {
-      if (editingProductId) {
-        // Update existing product
-        const { error } = await supabaseClient
-          .from('productos')
-          .update(productData)
-          .eq('id', editingProductId);
-        
-        if (error) throw error;
-      } else {
-        // Add new product
-        const { error } = await supabaseClient
-          .from('productos')
-          .insert([productData]);
-        
-        if (error) throw error;
-      }
+      const { error } = await supabaseClient
+        .from('productos')
+        .insert([productData]);
+      if (error) throw error;
     }
     
     // Close form and reload
@@ -188,26 +155,17 @@ async function loadProductsList() {
   const productsList = document.getElementById('productsList');
   
   try {
-    if (useLocalFallback) {
-      if (!localCache || localCache.length === 0) {
-        productsList.innerHTML = '<p class="empty-state">No hay productos. Agrega uno para comenzar.</p>';
-        return;
-      }
-      productsList.innerHTML = localCache.map(product => renderAdminProductItem(product)).join('');
-      return;
-    }
-
     const { data: products, error } = await supabaseClient
       .from('productos')
       .select('*')
       .order('id', { ascending: false });
 
     if (error) {
-      // fallback to local if table missing
       if (/Could not find the table/.test(error.message || '')) {
-        useLocalFallback = true;
-        ensureLocalInit();
-        productsList.innerHTML = localCache.length ? localCache.map(p => renderAdminProductItem(p)).join('') : '<p class="empty-state">No hay productos. Agrega uno para comenzar.</p>';
+        const sql = `CREATE TABLE public.productos (\n  id serial PRIMARY KEY,\n  nombre text NOT NULL,\n  preco numeric(10,2) NOT NULL,\n  imagen_url text,\n  descuento integer DEFAULT 0,\n  descripcion text,\n  created_at timestamptz DEFAULT now()\n);`;
+        console.error('Tabla "public.productos" no encontrada. SQL sugerido:\n' + sql);
+        alert("Tabla 'productos' no encontrada en Supabase. Revisa la consola para el SQL sugerido.");
+        productsList.innerHTML = '<p class="empty-state">Error al cargar productos</p>';
         return;
       }
       throw error;
@@ -252,20 +210,6 @@ function escapeHtml(text) {
 // Edit Product
 async function editProduct(id) {
   try {
-    if (useLocalFallback) {
-      const product = localCache.find(p => p.id === id);
-      if (!product) throw new Error('Producto no encontrado');
-      editingProductId = id;
-      document.getElementById('productTitle').value = product.nombre;
-      document.getElementById('productPrice').value = product.preco;
-      document.getElementById('productDiscount').value = product.descuento || 0;
-      document.getElementById('productDescription').value = product.descripcion || '';
-      imagePreview.innerHTML = `<img src="${product.imagen_url}" alt="${product.nombre}" />`;
-      document.getElementById('formTitle').textContent = 'Editar Producto';
-      productForm.classList.remove('hidden');
-      return;
-    }
-
     const { data: product, error } = await supabaseClient
       .from('productos')
       .select('*')
@@ -297,14 +241,6 @@ async function deleteProduct(id) {
   if (!confirm('¿Eliminar este producto?')) return;
   
   try {
-    if (useLocalFallback) {
-      localCache = localCache.filter(p => p.id !== id);
-      saveLocalProducts(localCache);
-      loadProductsList();
-      updateDashboard();
-      return;
-    }
-
     const { error } = await supabaseClient
       .from('productos')
       .delete()
@@ -323,15 +259,17 @@ async function deleteProduct(id) {
 // Update Dashboard
 async function updateDashboard() {
   try {
-    let products = [];
-    if (useLocalFallback) {
-      products = localCache || [];
-    } else {
-      const { data: productsData, error: productsError } = await supabaseClient
-        .from('productos')
-        .select('*');
-      if (productsError) throw productsError;
-      products = productsData || [];
+    const { data: products, error: productsError } = await supabaseClient
+      .from('productos')
+      .select('*');
+    if (productsError) {
+      if (/Could not find the table/.test(productsError.message || '')) {
+        const sql = `CREATE TABLE public.productos (\n  id serial PRIMARY KEY,\n  nombre text NOT NULL,\n  preco numeric(10,2) NOT NULL,\n  imagen_url text,\n  descuento integer DEFAULT 0,\n  descripcion text,\n  created_at timestamptz DEFAULT now()\n);`;
+        console.error('Tabla "public.productos" no encontrada. SQL sugerido:\n' + sql);
+        alert("Tabla 'productos' no encontrada en Supabase. Revisa la consola para el SQL sugerido.");
+        return;
+      }
+      throw productsError;
     }
 
     const totalProducts = products ? products.length : 0;
